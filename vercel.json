@@ -1,22 +1,22 @@
 {
   "version": 2,
   "functions": {
-    "server.js": {
+    "api/server.js": {
       "maxDuration": 30
     }
   },
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "/server.js"
+      "destination": "/api/server.js"
     },
     {
       "source": "/socket.io/(.*)",
-      "destination": "/server.js"
+      "destination": "/api/server.js"
     },
     {
       "source": "/((?!.*\\.).*)",
-      "destination": "/server.js"
+      "destination": "/api/server.js"
     }
   ]
 }
