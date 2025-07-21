@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏁 TikTok Racing Marathon - Países Compitiendo</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <button class="theme-toggle" onclick="toggleTheme()" aria-label="Cambiar tema">
+                <i class="fas fa-moon" id="themeIcon"></i>
+                <span id="themeText">Oscuro</span>
+            </button>
+            <h1>🏁 TikTok Racing Marathon 🏁</h1>
+            <p>¡Países compitiendo en tiempo real con TikTok Live! Los viewers se unen a equipos y sus regalos impulsan a sus países.</p>
+        </div>
+        
+        <div class="status-bar">
+            <div class="status-item">
+                <i class="fas fa-wifi"></i>
+                <span id="connectionStatus" class="status-disconnected">Desconectado</span>
+            </div>
+            <div class="status-item">
+                <i class="fas fa-flag-checkered"></i>
+                <span id="raceStatus">Esperando...</span>
+            </div>
+            <div class="status-item">
+                <i class="fas fa-users"></i>
+                <span id="viewerCount">0 viewers</span>
+            </div>
+            <div class="status-item">
+                <i class="fas fa-globe"></i>
+                <span id="countryCount">0 países</span>
+            </div>
+        </div>
+        
+        <div class="controls-grid">
+            <!-- Panel de Conexión -->
+            <div class="control-panel">
+                <h3><i class="fab fa-tiktok"></i> Conexión TikTok Live</h3>
+                <div class="input-group">
+                    <label for="tiktokUsername">Usuario de TikTok (sin @):</label>
+                    <input type="text" id="tiktokUsername" placeholder="Ej: usuario_tiktok" required>
+                </div>
+                <button id="connectBtn" onclick="connectToTikTok()">
+                    <i class="fas fa-plug"></i> Conectar a Live
+                </button>
+                <button id="disconnectBtn" onclick="disconnectFromTikTok()" style="display:none; margin-top:10px;" class="btn-warning">
+                    <i class="fas fa-times"></i> Desconectar
+                </button>
+            </div>
+            
+            <!-- Panel de Control de Carrera -->
+            <div class="control-panel">
+                <h3><i class="fas fa-play-circle"></i> Control de Maratón</h3>
+                <div class="input-group">
+                    <label for="lapsToWin">Vueltas para ganar:</label>
+                    <input type="number" id="lapsToWin" value="3" min="1" max="10">
+                </div>
+                <button id="startRaceBtn" onclick="startRace()" class="btn-success">
+                    <i class="fas fa-flag-checkered"></i> Iniciar Maratón
+                </button>
+                <button id="stopRaceBtn" onclick="stopRace()" style="display:none; margin-top:10px;" class="btn-warning">
+                    <i class="fas fa-stop"></i> Detener Carrera
+                </button>
+            </div>
+            
+            <!-- Panel de Configuración de Regalos -->
+            <div class="control-panel">
+                <h3><i class="fas fa-gift"></i> Configurar Regalos</h3>
+                <button onclick="openGiftConfig()" class="btn-warning">
+                    <i class="fas fa-cog"></i> Configurar Efectos
+                </button>
+                <button onclick="loadAvailableGifts()" class="btn-success" style="margin-top: 10px;">
+                    <i class="fas fa-download"></i> Cargar Regalos del Live
+                </button>
+                <div style="margin-top: 15px; font-size: 13px; opacity: 0.9; line-height: 1.5;">
+                    <strong>Regalos configurados:</strong> <span id="giftCount">8</span><br>
+                    <strong>Regalos disponibles:</strong> <span id="availableGiftCount">0</span><br>
+                    <strong>🏁 Límite de países por carrera:</strong> <span style="color: var(--accent-warning); font-weight: bold;">5 países máximo</span><br>
+                    <strong>🌍 Países disponibles:</strong><br>
+                    • 🇺🇸 USA, 🇲🇽 México, 🇧🇷 Brasil, 🇦🇷 Argentina<br>
+                    • 🇨🇴 Colombia, 🇪🇸 España, 🇫🇷 Francia, 🇩🇪 Alemania<br>
+                    • 🇮🇹 Italia, 🇬🇧 Reino Unido, 🇯🇵 Japón, 🇰🇷 Corea del Sur<br>
+                    • 🇨🇳 China, 🇮🇳 India, 🇷🇺 Rusia, 🇨🇦 Canadá<br>
+                    <strong>Comandos para viewers:</strong><br>
+                    • "join USA" - Unirse a Estados Unidos<br>
+                    • "team Mexico" - Unirse a México<br>
+                    • "equipo Brasil" - Unirse a Brasil
+                </div>
+            </div>
+            
+            <!-- Panel de Información -->
+            <div class="control-panel">
+                <h3><i class="fas fa-info-circle"></i> Información</h3>
+                <div style="font-size: 14px; line-height: 1.6;">
+                    <p><strong>🎮 Cómo funciona:</strong></p>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li>Los viewers escriben comandos para unirse a países</li>
+                        <li>Sus likes y regalos impulsan a su país</li>
+                        <li>Cada país debe completar varias vueltas</li>
+                        <li>El primer país en completar todas las vueltas gana</li>
+                        <li>Después de cada victoria, la carrera se reinicia</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Estado del Maratón -->
+        <div class="marathon-status">
+            <h3><i class="fas fa-chart-line"></i> Estado del Maratón</h3>
+            <div class="marathon-stats">
+                <div class="stat-item">
+                    <i class="fas fa-flag-checkered"></i>
+                    <span class="stat-label">Vueltas para ganar:</span>
+                    <span id="marathonLaps" class="stat-value">3</span>
+                </div>
+                <div class="stat-item">
+                    <i class="fas fa-globe-americas"></i>
+                    <span class="stat-label">Países activos:</span>
+                    <span id="marathonCountries" class="stat-value">0</span>
+                </div>
+                <div class="stat-item">
+                    <i class="fas fa-eye"></i>
+                    <span class="stat-label">Viewers:</span>
+                    <span id="marathonViewers" class="stat-value">0</span>
+                </div>
+                <div class="stat-item winner-display" id="lastWinnerDisplay" style="display: none;">
+                    <i class="fas fa-crown"></i>
+                    <span class="stat-label">Último ganador:</span>
+                    <span id="lastWinnerText" class="stat-value winner-text"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Canvas del Juego -->
+        <canvas id="gameCanvas" width="1200" height="600"></canvas>
+        
+        <!-- Información de la Carrera -->
+        <div class="race-info">
+            <div class="leaderboard">
+                <h3><i class="fas fa-trophy"></i> Tabla de Posiciones</h3>
+                <div id="leaderboardContainer">
+                    <p style="text-align: center; opacity: 0.7;">No hay países compitiendo aún</p>
+                </div>
+            </div>
+            
+            <div class="live-events">
+                <h3><i class="fas fa-bolt"></i> Eventos en Vivo</h3>
+                <div id="eventsContainer">
+                    <p style="text-align: center; opacity: 0.7;">Esperando eventos...</p>
+                </div>
+                
+                <div class="chat-messages" id="chatMessages">
+                    <!-- Mensajes de chat aparecerán aquí -->
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal de Configuración de Regalos -->
+    <div id="giftConfigModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeGiftConfig()">&times;</span>
+            <h3><i class="fas fa-gift"></i> Configuración Avanzada de Regalos</h3>
+            
+            <div class="gift-tabs">
+                <button class="tab-btn active" onclick="showTab('configured')" id="configuredTabBtn">Regalos Configurados</button>
+                <button class="tab-btn" onclick="showTab('available')" id="availableTabBtn">Regalos del Live</button>
+            </div>
+            
+            <div id="configuredTab" class="tab-content active">
+                <div class="gift-config" id="giftConfigContainer">
+                    <!-- Configuración de regalos se cargará aquí -->
+                </div>
+            </div>
+            
+            <div id="availableTab" class="tab-content" style="display: none;">
+                <div class="available-gifts-info" style="background: rgba(76, 175, 80, 0.1); padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #4CAF50;">
+                    <p>Estos son los regalos disponibles en el TikTok Live actual:</p>
+                </div>
+                <div class="available-gifts-grid" id="availableGiftsGrid">
+                    <!-- Se llenará con regalos del live -->
+                </div>
+            </div>
+            
+            <div style="margin-top: 20px; display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap;">
+                <button onclick="saveGiftConfig()" class="btn-success">
+                    <i class="fas fa-save"></i> Guardar Configuración
+                </button>
+                <button onclick="resetGiftConfig()" style="background: #6c757d; color: white; padding: 12px; border: none; border-radius: 8px; cursor: pointer;">
+                    <i class="fas fa-undo"></i> Restaurar Valores
+                </button>
+                <button onclick="closeGiftConfig()" style="background: #dc3545; color: white; padding: 12px; border: none; border-radius: 8px; cursor: pointer;">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="game.js"></script>
+</body>
+</html>
