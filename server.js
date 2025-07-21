@@ -2,6 +2,7 @@ const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
 const cors = require('cors');
+const path = require('path');
 const { WebcastPushConnection } = require('tiktok-live-connector');
 const { v4: uuidv4 } = require('uuid');
 require('dotenv').config();
@@ -745,6 +746,11 @@ setInterval(() => {
     });
   }
 }, 100); // 10 FPS
+
+// Ruta principal
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
 
 // Rutas API
 app.get('/api/status', (req, res) => {
